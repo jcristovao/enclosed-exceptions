@@ -1,7 +1,8 @@
 name:                async-exception
 version:             0.7.0
-synopsis:            Catching all synchronous exceptions
-description:         Catching all synchronous exceptions, while re-throwing all asynchronous exceptions
+synopsis:            Catching all exceptions from within an enclosed computation
+description:         Catching all exceptions raised within an enclosed computation,
+                     while remaining responsive to (external) asynchronous exceptions.
 homepage:            https://github.com/jcristovao/async-exceptions
 license:             MIT
 license-file:        LICENSE
@@ -12,7 +13,7 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 library
-  exposed-modules:   Control.Concurrent.Async.Exception
+  exposed-modules:   Control.Exception.Enclosed
   hs-source-dirs:    src
   build-depends:       base                          >= 4          && < 5
                      , transformers

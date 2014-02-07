@@ -9,7 +9,7 @@ import Data.IORef
 import Data.Typeable
 import Control.Monad.IO.Class
 import Control.Concurrent (throwTo, threadDelay, forkIO)
-import Control.Concurrent.Async.Exception
+import Control.Exception.Enclosed
 
 {-# ANN main ("HLint: ignore Redundant do"::String) #-}
 main :: IO ()
