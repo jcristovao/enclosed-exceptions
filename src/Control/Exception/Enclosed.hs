@@ -18,7 +18,7 @@
 -- actions.
 --
 -- This library was originally developed by Michael Snoyman for the
--- 'ClassyPrelude' library, and was latter 'spined-off' into a separate
+-- 'ClassyPrelude' library, and was latter 'spun-off' into a separate
 -- independent package.
 --
 -- For a more detailed explanation of the motivation behind this functions,
