@@ -1,5 +1,5 @@
-name:                async-exception
-version:             0.7.0
+name:                enclosed-exceptions
+version:             1.0.0
 synopsis:            Catching all exceptions from within an enclosed computation
 description:         Catching all exceptions raised within an enclosed computation,
                      while remaining responsive to (external) asynchronous exceptions.
@@ -39,4 +39,4 @@ test-suite test
 
 source-repository head
   type:     git
-  location: git://github.com/jcristovao/async-exception.git
+  location: git://github.com/jcristovao/enclosed_exceptions.git
