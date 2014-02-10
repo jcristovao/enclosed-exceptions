@@ -15,7 +15,7 @@ while remaining responsive to higher level events and control actions.
 
 This library was originally developed by [Michael Snoyman](http://www.snoyman.com/) for the
 [ClassyPrelude](http://hackage.haskell.org/package/classy-prelude) library,
-and was latter 'spun-off' into a separate independent package.
+and was latter spun-off into a separate independent package.
 
 For a more detailed explanation of the motivation behind this functions, see:
 
