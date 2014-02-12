@@ -7,7 +7,7 @@ homepage:            https://github.com/jcristovao/enclosed-exceptions
 license:             MIT
 license-file:        LICENSE
 author:              Michael Snoyman, João Cristóvão
-maintainer:          jcristovao@gmail.com, michael@snoyman.com
+maintainer:          jmacristovao@gmail.com, michael@snoyman.com
 category:            Control, Prelude
 build-type:          Simple
 cabal-version:       >=1.8
