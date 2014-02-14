@@ -119,7 +119,7 @@ tryAnyDeep m = tryAny $ do
 --
 -- Since 0.5.6
 catchIO :: MonadBaseControl IO m => m a -> (IOException -> m a) -> m a
-catchIO = catch
+catchIO = Control.Exception.Lifted.catch
 
 -- | A version of 'handle' which is specialized for IO exceptions.  This
 -- simplifies usage as no explicit type signatures are necessary.
