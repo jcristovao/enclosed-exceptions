@@ -3,6 +3,8 @@ version:             1.0.0.1
 synopsis:            Catching all exceptions from within an enclosed computation
 description:         Catching all exceptions raised within an enclosed computation,
                      while remaining responsive to (external) asynchronous exceptions.
+                     For more information on the technique, please see:
+                     <https://www.fpcomplete.com/user/snoyberg/general-haskell/exceptions/catching-all-exceptions>
 homepage:            https://github.com/jcristovao/enclosed-exceptions
 license:             MIT
 license-file:        LICENSE
