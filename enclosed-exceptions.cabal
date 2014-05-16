@@ -16,11 +16,11 @@ library
   exposed-modules:   Control.Exception.Enclosed
   hs-source-dirs:    src
   build-depends:       base                          >= 4          && < 5
-                     , transformers
-                     , lifted-base                   >= 0.2
-                     , monad-control
-                     , async                         >= 2.0
-                     , deepseq
+                     , transformers                  >= 0.3        && < 0.5
+                     , lifted-base                   >= 0.2        && < 0.3
+                     , monad-control                 >= 0.3        && < 0.4
+                     , async                         >= 2.0        && < 2.1
+                     , deepseq                       >= 1.0        && < 1.4
   ghc-options:         -Wall -fno-warn-orphans
 
 test-suite test
