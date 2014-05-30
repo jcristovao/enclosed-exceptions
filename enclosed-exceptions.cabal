@@ -1,5 +1,5 @@
 name:                enclosed-exceptions
-version:             1.0.0.1
+version:             1.0.0.2
 synopsis:            Catching all exceptions from within an enclosed computation
 description:         Catching all exceptions raised within an enclosed computation,
                      while remaining responsive to (external) asynchronous exceptions.
