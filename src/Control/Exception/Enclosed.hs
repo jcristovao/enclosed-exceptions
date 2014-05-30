@@ -50,6 +50,7 @@ module Control.Exception.Enclosed
 import Prelude
 import Control.Exception.Lifted
 import Control.Monad (liftM)
+import Control.Monad.Base (liftBase)
 import Control.Monad.Trans.Control (MonadBaseControl, liftBaseWith, restoreM)
 import Control.Concurrent.Async (withAsync, waitCatch)
 import Control.DeepSeq (NFData, ($!!))
@@ -112,7 +113,7 @@ tryAnyDeep :: (NFData a, MonadBaseControl IO m)
            -> m (Either SomeException a)
 tryAnyDeep m = tryAny $ do
     x <- m
-    return $!! x
+    liftBase $ evaluate $!! x
 
 -- | A version of 'catch' which is specialized for IO exceptions. This
 -- simplifies usage as no explicit type signatures are necessary.
