@@ -9,6 +9,7 @@ import Data.IORef
 import Data.Typeable
 import Control.Monad.IO.Class
 import Control.Concurrent (throwTo, threadDelay, forkIO)
+import Control.Concurrent.MVar (newEmptyMVar, takeMVar)
 import Control.Exception.Enclosed
 
 {-# ANN main ("HLint: ignore Redundant do"::String) #-}
@@ -44,6 +45,12 @@ main = hspec $ do
                     | Just DummyException <- fromException e -> return ()
                     | otherwise -> error "Expected a DummyException"
                 Right () -> error "Expected an exception" :: IO ()
+
+    it "MVar deadlocks simonmar/async#14" $ do
+        res <- tryAny $ newEmptyMVar >>= takeMVar
+        case res of
+            Left _ -> return ()
+            Right () -> error "Expected Left value"
 
 data DummyException = DummyException
     deriving (Show, Typeable)
