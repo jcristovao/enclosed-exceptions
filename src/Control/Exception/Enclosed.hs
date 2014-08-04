@@ -87,8 +87,20 @@ handleAny = flip catchAny
 -- Since 0.5.6
 tryAny :: MonadBaseControl IO m => m a -> m (Either SomeException a)
 tryAny m =
-    liftBaseWith (\runInIO -> withAsync (runInIO m) waitCatch) >>=
+    liftBaseWith (\runInIO -> withAsync (runInIO m) waitCatch') >>=
     either (return . Left) (liftM Right . restoreM)
+  where
+    -- If the user-provided function deadlocks on an MVar or STM
+    -- transaction, our thread will be sent a BlockedIndefinitelyOnSTM
+    -- exception. For more information, see:
+    -- https://github.com/simonmar/async/issues/14.
+    --
+    -- There is a small flaw with this: using @throwTo@ to kill this
+    -- thread with BlockedIndefinitelyOnSTM won't work. However, that
+    -- seems far less likely than the user supplied function blocking
+    -- indefinitely on an MVar or STM transaction.
+    waitCatch' a = waitCatch a `catch`
+        \BlockedIndefinitelyOnSTM -> waitCatch a
 
 -- | An extension to @catchAny@ which ensures that the return value is fully
 -- evaluated. See @tryAnyDeep@.
