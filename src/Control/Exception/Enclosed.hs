@@ -35,8 +35,10 @@ module Control.Exception.Enclosed
       catchAny
     , handleAny
     , tryAny
+    , catchDeep
     , catchAnyDeep
     , handleAnyDeep
+    , tryDeep
     , tryAnyDeep
     , catchIO
     , handleIO
@@ -90,6 +92,13 @@ tryAny m =
     liftBaseWith (\runInIO -> withAsync (runInIO m) waitCatch) >>=
     either (return . Left) (liftM Right . restoreM)
 
+-- | An extension to @catch@ which ensures that the return value is fully
+-- evaluated. See @tryAny@.
+--
+-- Since 1.0.1
+catchDeep :: (Exception e, NFData a, MonadBaseControl IO m) => m a -> (e -> m a) -> m a
+catchDeep action onE = tryDeep action >>= either onE return
+
 -- | An extension to @catchAny@ which ensures that the return value is fully
 -- evaluated. See @tryAnyDeep@.
 --
@@ -103,8 +112,21 @@ catchAnyDeep action onE = tryAnyDeep action >>= either onE return
 handleAnyDeep :: (NFData a, MonadBaseControl IO m) => (SomeException -> m a) -> m a -> m a
 handleAnyDeep = flip catchAnyDeep
 
--- | An extension to @tryAny@ which ensures that the return value is fully
--- evaluated. In other words, if you get a @Right@ response here, you can be
+-- | an extension to @try@ which ensures that the return value is fully
+-- evaluated. in other words, if you get a @right@ response here, you can be
+-- confident that using it will not result in another exception.
+--
+-- Since 1.0.1
+tryDeep :: (Exception e, NFData a, MonadBaseControl IO m)
+        => m a
+        -> m (Either e a)
+tryDeep m = try $ do
+    x <- m
+    liftBase $ evaluate $!! x
+
+
+-- | an extension to @tryany@ which ensures that the return value is fully
+-- evaluated. in other words, if you get a @right@ response here, you can be
 -- confident that using it will not result in another exception.
 --
 -- Since 0.5.9
@@ -147,4 +169,3 @@ asSomeException = id
 -- Since 0.5.6
 asIOException :: IOException -> IOException
 asIOException = id
-

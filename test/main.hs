@@ -1,5 +1,6 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PatternGuards #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 import Test.Hspec
@@ -27,6 +28,21 @@ main = hspec $ do
             threadDelay 50000
             didFail <- readIORef failed
             liftIO $ didFail `shouldBe` (0 :: Int)
+
+        it "catchDeep" $ do
+            failed <- newIORef 0
+            tid <- forkIO $ do
+                catchDeep
+                    (threadDelay 10000 >> return (throw DummyExceptionInternal))
+                    (\(_::DummyExceptionInternal) -> writeIORef failed 1)
+                threadDelay 20000
+                writeIORef failed 2
+            threadDelay 20000
+            throwTo tid DummyException
+            threadDelay 50000
+            didFail <- readIORef failed
+            liftIO $ didFail `shouldBe` (1 :: Int)
+
         it "tryAny" $ do
             failed <- newIORef False
             tid <- forkIO $ do
@@ -37,6 +53,13 @@ main = hspec $ do
             threadDelay 50000
             didFail <- readIORef failed
             liftIO $ didFail `shouldBe` False
+
+        it "tryDeep" $ do
+            eres <- tryDeep $ return $ throw DummyException
+            case eres of
+                Left DummyException -> return ()
+                Right () -> error "Expected an exception" :: IO ()
+
         it "tryAnyDeep" $ do
             eres <- tryAnyDeep $ return $ throw DummyException
             case eres of
@@ -49,4 +72,6 @@ data DummyException = DummyException
     deriving (Show, Typeable)
 instance Exception DummyException
 
-
+data DummyExceptionInternal = DummyExceptionInternal
+    deriving (Show, Typeable)
+instance Exception DummyExceptionInternal
