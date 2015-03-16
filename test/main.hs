@@ -2,7 +2,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE RankNTypes #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 import Test.Hspec
 import Test.QuickCheck.Arbitrary ()
@@ -108,7 +107,7 @@ catcherCatchesInside fCatch asExpected = do
     caughtRef <- newIORef False
     thread <- async $ do
         fCatch
-            (throw DummyExceptionInternal)
+            (throwIO DummyExceptionInternal)
             (catchAssert DummyExceptionInternal $ writeIORef caughtRef True)
         caught <- readIORef caughtRef
         caught `shouldBe` True
@@ -154,7 +153,7 @@ trierCatchesInside :: Trier -> Bool -> IO ()
 trierCatchesInside fTry asExpected = do
     caughtRef <- newIORef False
     thread <- async $ do
-        _ <- fTry (throw DummyException)
+        _ <- fTry (throwIO DummyException)
         writeIORef caughtRef True
     _ <- waitCatch thread
     caught <- readIORef caughtRef
