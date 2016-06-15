@@ -101,7 +101,29 @@ tryAny m =
         bracket
             (forkIOWithUnmask (\restore -> try (restore action) >>= putMVar result))
             (\t -> throwTo t ThreadKilled)
-            (\_ -> readMVar result)
+            (\_ -> retryCount 10 (readMVar result))
+
+    -- If the action supplied by the user ends up blocking on an MVar
+    -- or STM action, all threads currently blocked on such an action will
+    -- receive an exception. In general, this is a good thing from the GHC
+    -- RTS, but it is counter-productive for our purposes, where we know that
+    -- when the user action receives such an exception, our code above will
+    -- unblock and our main thread will not deadlock.
+    --
+    -- Workaround: we retry the readMVar action if we received a
+    -- BlockedIndefinitelyOnMVar. To remain on the safe side and avoid
+    -- deadlock, we cap this at an arbitrary number (10) above so that, if
+    -- there's a bug in this function, the runtime system can still recover.
+    --
+    -- For previous discussion of this topic, see:
+    -- https://github.com/simonmar/async/pull/15
+    retryCount :: Int -> IO a -> IO a
+    retryCount cnt0 action =
+        loop cnt0
+      where
+        loop 0 = action
+        loop cnt = action `catch`
+            \BlockedIndefinitelyOnMVar -> loop (cnt - 1)
 
 -- | An extension to @catch@ which ensures that the return value is fully
 -- evaluated. See @tryAny@.
