@@ -11,6 +11,7 @@ import Data.Typeable
 import Control.Concurrent (threadDelay)
 import Control.Concurrent.Async (async, cancelWith, waitCatch)
 import Control.Concurrent.MVar
+import Control.Concurrent.STM
 import Control.Exception.Enclosed
 import Control.Monad (forever)
 
@@ -76,6 +77,21 @@ main = hspec $ do
                 tryAny `trierCatchesOutside` False
             it "doesn't catch exceptions lazily thrown in its pure result" $ do
                 tryAny `trierCatchesDeep` False
+
+            let shouldBeShow :: Show a => a -> a -> IO ()
+                shouldBeShow x y = show x `shouldBe` show y
+
+            it "isn't fooled by BlockedIndefinitelyOnMVar" $ do
+                res <- tryAny $ do
+                    var <- newEmptyMVar
+                    takeMVar (var :: MVar ())
+                res `shouldBeShow` Left (toException BlockedIndefinitelyOnMVar)
+
+            it "isn't fooled by BlockedIndefinitelyOnTVar" $ do
+                res <- tryAny $ do
+                    var <- atomically newEmptyTMVar
+                    atomically $ takeTMVar (var :: TMVar ())
+                res `shouldBeShow` Left (toException BlockedIndefinitelyOnSTM)
 
         describe "tryDeep" $ do
             it "catches exceptions thrown from the inside" $ do
