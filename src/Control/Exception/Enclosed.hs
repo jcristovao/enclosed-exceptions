@@ -50,12 +50,15 @@ module Control.Exception.Enclosed
     ) where
 
 import Prelude
-import Control.Exception.Lifted
+import Control.Concurrent (forkIOWithUnmask)
+import Control.Concurrent.MVar (newEmptyMVar, putMVar, readMVar)
+import Control.Exception
 import Control.Monad (liftM)
 import Control.Monad.Base (liftBase)
 import Control.Monad.Trans.Control (MonadBaseControl, liftBaseWith, restoreM)
-import Control.Concurrent.Async (withAsync, waitCatch)
 import Control.DeepSeq (NFData, ($!!))
+
+import qualified Control.Exception.Lifted
 
 -- | A version of 'catch' which is specialized for any exception. This
 -- simplifies usage as no explicit type signatures are necessary.
@@ -89,8 +92,16 @@ handleAny = flip catchAny
 -- Since 0.5.6
 tryAny :: MonadBaseControl IO m => m a -> m (Either SomeException a)
 tryAny m =
-    liftBaseWith (\runInIO -> withAsync (runInIO m) waitCatch) >>=
+    liftBaseWith (\runInIO -> tryAnyIO (runInIO m)) >>=
     either (return . Left) (liftM Right . restoreM)
+  where
+    tryAnyIO :: IO a -> IO (Either SomeException a)
+    tryAnyIO action = do
+        result <- newEmptyMVar
+        bracket
+            (forkIOWithUnmask (\restore -> try (restore action) >>= putMVar result))
+            (\t -> throwTo t ThreadKilled)
+            (\_ -> readMVar result)
 
 -- | An extension to @catch@ which ensures that the return value is fully
 -- evaluated. See @tryAny@.
@@ -120,7 +131,7 @@ handleAnyDeep = flip catchAnyDeep
 tryDeep :: (Exception e, NFData a, MonadBaseControl IO m)
         => m a
         -> m (Either e a)
-tryDeep m = try $ do
+tryDeep m = Control.Exception.Lifted.try $ do
     x <- m
     liftBase $ evaluate $!! x
 
@@ -149,14 +160,14 @@ catchIO = Control.Exception.Lifted.catch
 --
 -- Since 0.5.6
 handleIO :: MonadBaseControl IO m => (IOException -> m a) -> m a -> m a
-handleIO = handle
+handleIO = Control.Exception.Lifted.handle
 
 -- | A version of 'try' which is specialized for IO exceptions.
 -- This simplifies usage as no explicit type signatures are necessary.
 --
 -- Since 0.5.6
 tryIO :: MonadBaseControl IO m => m a -> m (Either IOException a)
-tryIO = try
+tryIO = Control.Exception.Lifted.try
 
 -- |
 --
