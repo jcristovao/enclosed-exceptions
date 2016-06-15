@@ -36,6 +36,7 @@ test-suite test
                    , deepseq
                    , hspec                         >= 1.3
                    , QuickCheck
+                   , stm
                    , transformers
                    , transformers-base
     ghc-options:     -Wall
