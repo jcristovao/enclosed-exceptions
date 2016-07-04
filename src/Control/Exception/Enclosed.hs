@@ -122,7 +122,7 @@ tryAny m =
         loop cnt0
       where
         loop 0 = action
-        loop cnt = action `catch`
+        loop cnt = action `Control.Exception.catch`
             \BlockedIndefinitelyOnMVar -> loop (cnt - 1)
 
 -- | An extension to @catch@ which ensures that the return value is fully
