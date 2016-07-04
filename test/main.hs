@@ -6,6 +6,7 @@
 import Test.Hspec
 import Test.QuickCheck.Arbitrary ()
 import Control.Exception.Lifted hiding (throwTo)
+import Prelude hiding (catch)
 import Data.IORef
 import Data.Typeable
 import Control.Concurrent (threadDelay)
