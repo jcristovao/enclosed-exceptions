@@ -1,5 +1,5 @@
 name:                enclosed-exceptions
-version:             1.0.2
+version:             1.0.2.1
 synopsis:            Catching all exceptions from within an enclosed computation
 description:         Catching all exceptions raised within an enclosed computation,
                      while remaining responsive to (external) asynchronous exceptions.
@@ -13,11 +13,12 @@ maintainer:          jmacristovao@gmail.com, michael@snoyman.com
 category:            Control
 build-type:          Simple
 cabal-version:       >=1.8
+extra-source-files:  README.md ChangeLog.md
 
 library
   exposed-modules:   Control.Exception.Enclosed
   hs-source-dirs:    src
-  build-depends:       base                          >= 4          && < 5
+  build-depends:       base                          >= 4.4        && < 5
                      , transformers
                      , lifted-base                   >= 0.2
                      , monad-control
