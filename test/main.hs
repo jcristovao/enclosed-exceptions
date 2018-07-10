@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -79,6 +80,7 @@ main = hspec $ do
             it "doesn't catch exceptions lazily thrown in its pure result" $ do
                 tryAny `trierCatchesDeep` False
 
+#if !MIN_VERSION_base(4, 11, 0)
             let shouldBeShow :: Show a => a -> a -> IO ()
                 shouldBeShow x y = show x `shouldBe` show y
 
@@ -93,6 +95,7 @@ main = hspec $ do
                     var <- atomically newEmptyTMVar
                     atomically $ takeTMVar (var :: TMVar ())
                 res `shouldBeShow` Left (toException BlockedIndefinitelyOnSTM)
+#endif
 
         describe "tryDeep" $ do
             it "catches exceptions thrown from the inside" $ do
