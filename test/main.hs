@@ -80,7 +80,7 @@ main = hspec $ do
             it "doesn't catch exceptions lazily thrown in its pure result" $ do
                 tryAny `trierCatchesDeep` False
 
-#if !MIN_VERSION_base(4, 11, 0)
+#if !MIN_VERSION_async(2, 2, 0)
             let shouldBeShow :: Show a => a -> a -> IO ()
                 shouldBeShow x y = show x `shouldBe` show y
 
